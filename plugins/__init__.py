@@ -1,0 +1,1 @@
+from .crunchyrollplugin import CrunchyrollPlugin
