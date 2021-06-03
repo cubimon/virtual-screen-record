@@ -1,0 +1,6 @@
+PyVirtualDisplay
+selenium
+obs-websocket-py
+psutil
+pulsectl
+retrying
