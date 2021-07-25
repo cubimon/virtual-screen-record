@@ -1,26 +1,32 @@
 #!/usr/bin/python3
 
-import psutil
 import logging
 from pulsectl import Pulse
 from logging import error
 from os import environ
 from signal import signal, SIGINT
-from time import sleep
+from time import sleep, time
 from pathlib import Path
 from configparser import ConfigParser
 from selenium.webdriver import Firefox, FirefoxProfile
 from pyvirtualdisplay import Display
 
 from config import *
-from obs import OBS
+from recorders.ffmpeg import FFMPEG
 
 
 def shutdown():
+  if recorder:
+    logging.info('stopping recording')
+    recorder.stop_recording()
+  if display:
+    logging.info('stopping display')
+    display.stop()
   if driver:
+    logging.info('stopping webdriver')
     driver.close()
-  display.stop()
   if pulse_module_id:
+    logging.info('removing pulseaudio module')
     # TODO:
     pulse.module_unload(pulse_module_id)
     #Popen(['pactl', 'unload-module', str(pulse_module_id)])
@@ -54,6 +60,7 @@ signal(SIGINT, signal_handler)
 display = Display(backend=display_backend, size=(width, height), visible=display_visible)
 display.start()
 pulse_module_id = None
+# TODO: unload if it exists, this should solve our obs device issue
 try:
   pulse_sink_info = next(filter(
     lambda sink: sink.name == virtual_sink_name, pulse.sink_list()))
@@ -62,12 +69,15 @@ except StopIteration as e:
   logging.info('loaded null sink')
 pulse_sink_info = next(filter(
   lambda sink: sink.name == virtual_sink_name, pulse.sink_list()))
-obs = OBS()
-obs.prepare_recording(display.display, virtual_sink_name)
+recorder = FFMPEG()
+recorder.prepare_recording(display.display, virtual_sink_name)
 
 environ['PULSE_SINK'] = str(pulse_sink_info.index)
 
-driver = Firefox(get_firefox_profile())
+profile = get_firefox_profile()
+profile.set_preference('full-screen-api.allow-trusted-requests-only', False)
+profile.set_preference('media.autoplay.default', 0)
+driver = Firefox(profile)
 driver.set_window_position(0, 0)
 driver.set_window_size(width, height)
 driver.fullscreen_window()
@@ -81,20 +91,24 @@ for name, url in urls.items():
   print(f'going for {name} and {url}')
   driver.get(url)
   plugin.prepare()
-  obs.set_filename(name + '.mp4')
-  obs.start_recording()
+  recorder.set_filename(name)
+  recorder.start_recording()
   print('started recording')
   sleep(2) # wait a little to stabilize recording
   plugin.play()
   duration = plugin.get_duration()
-  sleep(duration)
-  obs.stop_recording()
+  duration += 1 # some offset to make sure we have everything
+  start_time = time()
+  remaining = duration - (time() - start_time)
+  while remaining > 0:
+    logging.info('remaining waiting time: ' + str(remaining))
+    if remaining < 30:
+      sleep(remaining)
+    else:
+      sleep(30)
+    remaining = duration - (time() - start_time)
+  recorder.stop_recording()
   print('stopped recording')
-  import pdb; pdb.set_trace()
-  # TODO: wait until stopped
-  # remove cursor?
 
-print('exited')
-import pdb; pdb.set_trace()
-
+print('finished all videos')
 shutdown()

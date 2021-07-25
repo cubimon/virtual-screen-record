@@ -37,8 +37,6 @@ class BasePlugin:
     self.set_time(0)
     self.remove_controls()
     self.fullscreen()
-    # TODO: this is required:
-    # about:config -> full-screen-api.allow-trusted-requests-only -> false
 
   def pause(self):
     if self.iframe:
@@ -48,8 +46,6 @@ class BasePlugin:
       self.driver.switch_to.default_content()
 
   def play(self):
-    # TODO: this is required
-    # about:config -> media.autoplay.default -> 0
     if self.iframe:
       self.driver.switch_to.frame(self.iframe)
     self.driver.execute_script('arguments[0].play()', self.video)

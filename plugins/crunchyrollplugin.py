@@ -6,7 +6,7 @@ class CrunchyrollPlugin(BasePlugin):
 
   @staticmethod
   def supports(url):
-    return True
+    return 'crunchyroll.com' in url
 
   def prepare(self):
     print('prepare')
@@ -20,8 +20,6 @@ class CrunchyrollPlugin(BasePlugin):
     super().prepare()
 
   def play(self):
-    # TODO: this is required
-    # about:config -> media.autoplay.default -> 0
     self.driver.switch_to.frame(self.iframe)
     self.driver.execute_script('arguments[0].play()', self.video)
     self.driver.switch_to.default_content()
