@@ -1,13 +1,23 @@
 from plugins import *
 
 urls = {
-  #'tower of god 1': 'https://www.crunchyroll.com/tower-of-god/episode-1-ball-795456'
-  'tower of god 2': 'https://www.crunchyroll.com/tower-of-god/episode-2-3400-three-four-hundredths-795592'
+  '1': '',
+  '2': '',
+  '3': '',
+  '4': '',
+  '5': '',
+  '6': '',
+  '7': '',
+  '8': '',
+  '9': '',
+  '10': '',
 }
 plugins = [
-  CrunchyrollPlugin
+  Crunchyroll,
+  Netflix
 ]
 #display_backend = "xephyr"
+#display_visible = True
 display_backend = "xvfb"
 display_visible = False
 width = 1920

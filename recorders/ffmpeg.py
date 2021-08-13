@@ -1,5 +1,4 @@
-from subprocess import Popen, PIPE
-from signal import SIGINT
+from subprocess import Popen, PIPE, DEVNULL
 
 class FFMPEG:
 
@@ -22,8 +21,10 @@ class FFMPEG:
     cmd = f'ffmpeg -draw_mouse 0 -hide_banner -y -thread_queue_size 512 ' \
           f'-f x11grab -framerate 60 -i :{self.display}.0 ' \
           f'-f pulse -i {self.virtual_audio_source_name} ' \
-          f'-c:v mpeg4 -q:v 1 -f mp4 {self.filename}'
-    self.process = Popen(cmd.split(), stdin=PIPE, stdout=PIPE, stderr=PIPE)
+          f'-c:v mpeg4 -q:v 1 -f matroska {self.filename}.mkv'
+          #f'-c:v mpeg4 -q:v 1 -f mp4 {self.filename}.mp4'
+    #'-b:v 10M -b:a 192k'
+    self.process = Popen(cmd.split(), stdin=PIPE, stdout=DEVNULL, stderr=DEVNULL)
 
   def stop_recording(self):
     if not self.process:

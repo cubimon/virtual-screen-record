@@ -2,7 +2,7 @@ from selenium.common.exceptions import NoSuchElementException
 
 from .baseplugin import *
 
-class CrunchyrollPlugin(BasePlugin):
+class Crunchyroll(BasePlugin):
 
   @staticmethod
   def supports(url):

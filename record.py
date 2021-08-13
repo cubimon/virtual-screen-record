@@ -97,7 +97,7 @@ for name, url in urls.items():
   sleep(2) # wait a little to stabilize recording
   plugin.play()
   duration = plugin.get_duration()
-  duration += 1 # some offset to make sure we have everything
+  duration = int(duration * 1.01) # some offset to make sure we have everything
   start_time = time()
   remaining = duration - (time() - start_time)
   while remaining > 0:

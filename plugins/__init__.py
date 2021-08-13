@@ -1,1 +1,2 @@
-from .crunchyrollplugin import CrunchyrollPlugin
+from .crunchyroll import Crunchyroll
+from .netflix import Netflix
